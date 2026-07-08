@@ -1,0 +1,19 @@
+{
+  "name": "Golden Star Local Manager",
+  "short_name": "Golden Star",
+  "description": "نظام إدارة أكاديمية رياضية يعمل محلياً على الموبايل بدون إنترنت",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0b1220",
+  "theme_color": "#0b1220",
+  "dir": "rtl",
+  "lang": "ar",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
