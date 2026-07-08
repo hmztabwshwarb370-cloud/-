@@ -1,6 +1,6 @@
 'use strict';
 
-const APP_VERSION = 'local-mobile-1.0.0';
+const APP_VERSION = 'local-mobile-1.0.1-responsive';
 const DB_NAME = 'golden_star_local_mobile_db';
 const DB_VERSION = 1;
 const SESSION_KEY = 'golden_star_local_session';
@@ -82,12 +82,30 @@ const menu = [
   ['dashboard','الرئيسية','📊',['admin','finance']], ['players','شؤون اللاعبين','🏃',['admin']], ['finance','المالية والمحاسبة','💳',['admin','finance']], ['paymentsQuery','الاستعلام عن الدفعات','🔎',['admin','finance']], ['users','المستخدمون','👥',['admin']], ['settings','إعدادات المؤسسة','⚙️',['admin']], ['backup','النسخ والبيانات','💾',['admin']]
 ];
 function allowed(item){ return item[3].includes(state.user.role) || state.user.permissions==='all'; }
+
+function toggleMobileMenu(){
+  const sb = $('sidebar');
+  const bd = $('drawerBackdrop');
+  if(!sb) return;
+  const open = !sb.classList.contains('open');
+  sb.classList.toggle('open', open);
+  if(bd) bd.classList.toggle('show', open);
+  document.body.style.overflow = open ? 'hidden' : '';
+}
+function closeMobileMenu(){
+  const sb = $('sidebar');
+  const bd = $('drawerBackdrop');
+  if(sb) sb.classList.remove('open');
+  if(bd) bd.classList.remove('show');
+  document.body.style.overflow = '';
+}
+
 function renderApp(){
   const nav = menu.filter(allowed).map(m=>`<button class="${state.page===m[0]?'active':''}" onclick="go('${m[0]}')"><span>${m[2]}</span>${m[1]}</button>`).join('');
-  $('app').innerHTML = `<div class="app-shell"><aside id="sidebar" class="sidebar"><div class="side-brand"><div class="logo">🏆</div><div><h2>${esc(state.data.settings.academyName.replace('أكاديمية ',''))}</h2><small>${esc(state.data.settings.academyEn||'')}</small></div></div><nav class="menu">${nav}</nav><div class="side-actions"><button class="side-action" onclick="exportBackup()">💾 نسخ احتياطي</button><button class="side-action" onclick="$('importJsonFile').click()">📥 استيراد نسخة</button><button class="side-action danger" onclick="logout()">⏻ تسجيل الخروج</button></div></aside><main class="main"><div class="topbar"><div><button class="btn btn-dark mobile-toggle" onclick="$('sidebar').classList.toggle('open')">☰</button><h1 id="pageTitle"></h1><p>${esc(state.data.settings.description)}</p></div><div class="user-pill">${esc(state.user.name)}</div></div><div id="content"></div></main></div>`;
+  $('app').innerHTML = `<div id="drawerBackdrop" class="drawer-backdrop" onclick="closeMobileMenu()"></div><div class="app-shell"><aside id="sidebar" class="sidebar"><div class="side-brand"><div class="logo">🏆</div><div><h2>${esc(state.data.settings.academyName.replace('أكاديمية ',''))}</h2><small>${esc(state.data.settings.academyEn||'')}</small></div></div><nav class="menu">${nav}</nav><div class="side-actions"><button class="side-action" onclick="exportBackup()">💾 نسخ احتياطي</button><button class="side-action" onclick="$('importJsonFile').click()">📥 استيراد نسخة</button><button class="side-action danger" onclick="logout()">⏻ تسجيل الخروج</button></div></aside><main class="main"><div class="topbar"><div><button class="btn btn-dark mobile-toggle" onclick="toggleMobileMenu()">☰</button><h1 id="pageTitle"></h1><p>${esc(state.data.settings.description)}</p></div><div class="user-pill">${esc(state.user.name)}</div></div><div id="content"></div></main></div>`;
   renderPage();
 }
-function go(page){ state.page=page; renderApp(); }
+function go(page){ closeMobileMenu(); state.page=page; renderApp(); }
 function renderPage(){ const item=menu.find(x=>x[0]===state.page); $('pageTitle').textContent=item?item[1]:'النظام'; ({dashboard,players,finance,paymentsQuery,users,settings,backup}[state.page]||dashboard)(); }
 function table(head, rows, empty='لا توجد بيانات'){
   return `<div class="table-wrap"><table><thead><tr>${head.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.length?rows.map(r=>`<tr>${r.map(c=>`<td>${c??''}</td>`).join('')}</tr>`).join(''):`<tr><td colspan="${head.length}" class="empty">${empty}</td></tr>`}</tbody></table></div>`;
